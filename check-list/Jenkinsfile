@@ -9,17 +9,26 @@ pipeline {
         CI = 'true'
     }
     stages {
-        stage('') {
-            parallel
-            stage('Build back') {
-                steps {
-                    sh 'npm install'
+        stage('Build and Test') {
+            parallel 'branch1': {
+                    node('node1') {
+                        stage('Setup') {
+                            steps {
+                            sh 'npm install'
+                            }
+                        }
                     }
-                }
-            stage('Build front') {
-                sh 'npm run client-install'
+            }, 'branch2': {
+                    node('node2') {
+                        stage('Setup') {
+                            steps {
+                            sh 'npm run client-install'
+                            }
+                        }
+                    }
             }
-            }
+        }
+
         stage('Test') {
             steps {
                 sh './jenkins/scripts/test.sh'
@@ -32,5 +41,5 @@ pipeline {
                 sh './jenkins/scripts/kill.sh'
             }
         }
-        }
     }
+}
